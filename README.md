@@ -32,7 +32,11 @@ A version of the PortfolioEnv that runs on live data. Supports serialization and
 # Examples
 TODO - SingleStockEnv + SimpleAgent
 TODO - SingleStockEnv -> random rollouts from stock pool
-TODO - 
-
+TODO - Portfolio + SimpleAgent
+  - Selection
+  - Purchase
+TODO - Portfolio + SimpleAgent with portfolio ratios
+TODO - Portfolio + SimpleAgent and stop losses
+TODO - Portfolio in GymEnv wrapper with vector action and obs space
 #
 
