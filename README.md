@@ -38,5 +38,13 @@ TODO - Portfolio + SimpleAgent
 TODO - Portfolio + SimpleAgent with portfolio ratios
 TODO - Portfolio + SimpleAgent and stop losses
 TODO - Portfolio in GymEnv wrapper with vector action and obs space
-#
+TODO - Options for scanning stocks
+
+# Other Stuff
+TODO - Loading data in 3 levels potentially? Reading an SQLite file, reading a csv, and pulling from yfinance
+  - option to preload tickers of certain frequency, timeframe and indicator values and save in a database
+  - option to save computations that have been loaded to a sqlite file
+  - option to clear existing saves
+  - option to view the total memory that's been used for data
+  - comparison of parsing a csv with known types vs parsing an sqlite file
 
