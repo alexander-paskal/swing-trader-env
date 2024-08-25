@@ -9,48 +9,51 @@ from datetime import datetime
 
 ### Action Space
 
+@ dataclass
 class Action:
-    """Action base class"""
-    pass
+    """Action base class - functions as a market order"""
+
+    """Stock ticker"""
+    ticker: str
+
+    """Number of shares. Allows fractional shares"""
+    shares: float
+
+    """Optional - date the order was entered. May be set externally"""
+    date_entered: datetime|None = None
 
 @dataclass
-class BuyAction:
+class BuyAction(Action):
     """Buy Action. Analogous to submitting a market buy order"""
 
-    """Stock ticker"""
-    ticker: str
-
-    """Number of shares. Allows fractional shares"""
-    shares: float
 
 @dataclass
-class SellAction:
+class SellAction(Action):
     """Sell Action. Analogous to submitting a market sell order"""
 
-    """Stock ticker"""
-    ticker: str
-
-    """Number of shares. Allows fractional shares"""
-    shares: float
 
 @dataclass
-class MultiBuyAction:
+class MultiAction:
+    """
+    A container class for multiple Buy or Sell actions
+    """
+    actions: List[BuyAction|SellAction]
 
-    """A list of all buy actions"""
-    buy_actions: List[BuyAction]
+    @property
+    def buy_actions(self) -> List[BuyAction]:
+        return [action for action in self.actions if isinstance(action, BuyAction)]
 
-@dataclass
-class MultiSellAction:
-
-    """A list of all sell actions"""
-    sell_actions: List[SellAction]
+    @property
+    def sell_actions(self) -> List[SellAction]:
+        return [action for action in self.actions if isinstance(action, SellAction)]
 
 
 ### Events
 @dataclass
-class SellEvent:
-    """Sell event. Equivalent to filling a sell order"""
-
+class OrderFilledEvent:
+    """
+    Base class representing the event of an order being filled
+    """
     ticker: str
     shares: float
     price: float
@@ -61,14 +64,11 @@ class SellEvent:
         return self.price * self.shares
 
 @dataclass
-class BuyEvent:
+class SellEvent(OrderFilledEvent):
+    """Sell event. Equivalent to filling a sell order"""
+
+
+@dataclass
+class BuyEvent(OrderFilledEvent):
     """Buy event. Equivalent to filling a buy order"""
     
-    ticker: str
-    shares: float
-    price: float
-    date: datetime
-
-    @property
-    def value(self) -> float:
-        return self.price * self.shares
