@@ -1,8 +1,17 @@
 """
 Date Wrapper utility class
 """
+# local imports
+from typing import Union
+from typing_extensions import Self
+from datetime import datetime, timedelta
+
+# external imports
+import pandas as pd
+from pandas.tseries.holiday import USFederalHolidayCalendar
 
 
+HOLIDAYS = USFederalHolidayCalendar().holidays(start=datetime(1970,1,1), end=datetime.today())
 
 
 class Date:

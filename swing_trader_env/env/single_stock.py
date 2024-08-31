@@ -37,6 +37,7 @@ class SingleStockEnv(BaseEnv):
             start_date: str|datetime|Date,
             principal: float,
             frequency: str = "daily",
+            data_path: str|None = None
     ):
         """
         Constructs a single-stock trading environment
@@ -55,7 +56,8 @@ class SingleStockEnv(BaseEnv):
         # load data model
         self._data = DataModel(
             ticker=ticker,
-            freqs=[frequency]
+            freqs=[frequency],
+            data_path=data_path
         )
         # reset stateful attributes
         self.reset()
@@ -102,6 +104,7 @@ class SingleStockEnv(BaseEnv):
         # reset public attributes
         self.cur_date = self.start_date
         self.cash = self.net_worth = self.principal
+        self.cur_price = self._data.get_price_on_close(self.cur_date)
         self.shares_held = 0
 
         # reset private attributes
@@ -127,11 +130,11 @@ class SingleStockEnv(BaseEnv):
         
         # record buy or sell action and annotate date
         if isinstance(action, (BuyAction, SellAction)):
-            action.date_entered = self.cur_date
+            action.date_entered = self.cur_date.as_datetime
             self._actions.append(action)
 
         # step the date forward
-        self.cur_date = self._data.get_next_tick(self)
+        self.cur_date = self._data.get_next_tick(self.frequency, self.cur_date)
         open_price = self._data.get_price_on_open(self.cur_date)
 
         # Fill the orders at the open price of the current date, update holdings, and generate BuyEvent or Sellevent
@@ -151,7 +154,7 @@ class SingleStockEnv(BaseEnv):
                 ticker=self.ticker,
                 shares=action.shares,
                 price=open_price,
-                date=self.cur_date,
+                date=self.cur_date.as_datetime,
             ))
 
         elif isinstance(action, SellAction):
@@ -170,7 +173,7 @@ class SingleStockEnv(BaseEnv):
                 ticker=self.ticker,
                 shares=action.shares,
                 price=open_price,
-                date=self.cur_date,
+                date=self.cur_date.as_datetime,
             ))        
 
             

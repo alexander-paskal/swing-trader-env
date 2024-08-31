@@ -5,6 +5,7 @@ Simple script which builds a single stock environment and implements a simple ag
 # local imports
 from swing_trader_env.env import SingleStockEnv
 from swing_trader_env.types import BuyAction, SellAction
+from swing_trader_env.core.utils import revenue
 # external dependencies
 
 
@@ -12,9 +13,10 @@ def main():
     # instantiate the env
     env = SingleStockEnv(
         ticker="AAPL",
-        date="2020-03-20",
+        start_date="2020-03-20",
         principal=10000,
-        frequency="daily"
+        frequency="daily",
+        data_path="swing-trader-old/data"
     )
 
     # step the environment 
@@ -26,8 +28,8 @@ def main():
             continue
         
         # buy on every on-20th action - Invest 90% of liquid capital
-        elif i % 20 == 0:
-            buy_action = BuyAction(ticker="AAPL",shares= (0.9 * env.cash) / env.close_price)
+        if i % 20 == 0:
+            buy_action = BuyAction(ticker="AAPL",shares= (0.9 * env.cash) / env.cur_price)
             env.step(buy_action)
 
         # sell on every off-20th action - Liquidate all shares held
@@ -42,4 +44,5 @@ def main():
 
     # render the results
     env.render()
-    
+
+main()

@@ -41,10 +41,12 @@ class DataModel:
 
     _synthetic_data: Dict[str, pd.DataFrame] = None
 
-    def __init__(self, ticker: os.PathLike, freqs: List[str]):
+    def __init__(self, ticker: os.PathLike, freqs: List[str], data_path: Optional[str] = None):
 
     
         self.ticker = ticker
+        if data_path is not None:
+            self.data_path = data_path
         
         for f in freqs:
             df = pd.read_csv(self._csv_path(ticker, f))
@@ -70,6 +72,7 @@ class DataModel:
         df["Date_str"] = date_df
         df["Date"] = pd.to_datetime(date_df)
         df = df.set_index("Date")
+        df["Date"] = df.index
         return df
     
     def access(self, freq: str, date: Date, attrs: Optional[List[str]] = None, length: Optional[int] = None) -> Tuple[Dict, List[Dict]]:

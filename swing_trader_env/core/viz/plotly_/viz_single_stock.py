@@ -13,7 +13,9 @@ from swing_trader_env.core.utils import Date
 import pandas as pd
 import plotly
 import plotly.graph_objects as go
+import plotly.io as pio
 
+pio.renderers.default = 'browser'
 
 def viz_single_stock(
     df: pd.DataFrame,
@@ -55,7 +57,7 @@ def viz_single_stock(
         action_type = "Buy" if isinstance(action, BuyAction) else "Sell" if isinstance(action, SellAction) else None
         color = "green" if isinstance(action, BuyAction) else "red" if isinstance(action, SellAction) else "gray"
         texts_actions.append(
-            f"{action_type}, {action.shares} shares at ${round(price, 2)}"
+            f"{action_type}, {round(action.shares, 2)} shares at ${round(price, 2)}"
         )
         colors_actions.append(color)
 
@@ -68,27 +70,26 @@ def viz_single_stock(
     for event in events:
         # event needs a date
         
-        x_events.append(event.date_entered)
-        price = df.loc[event.date_entered, "Open"]
+        x_events.append(event.date)
+        price = df.loc[event.date, "Open"]
         y_events.append(price)
         
-        event_type = "Bought" if isinstance(event, BuyEvent) else "Bought" if isinstance(event, SellEvent) else None
+        event_type = "Bought" if isinstance(event, BuyEvent) else "Sold" if isinstance(event, SellEvent) else None
         color = "green" if isinstance(event, BuyEvent) else "red" if isinstance(event, SellEvent) else "gray"
         texts_events.append(
-            f"{event_type}, {event.shares} shares at ${round(price, 2)}"
+            f"{event_type}, {round(event.shares,)} shares at ${round(price, 2)}"
         )
         colors_events.append(color)
-
 
     # Build the figure
     fig = go.Figure([
         # Add the underlying OHLC
         go.Ohlc(
             x=df['Date'],
-            open=df['AAPL.Open'],
-            high=df['AAPL.High'],
-            low=df['AAPL.Low'],
-            close=df['AAPL.Close'],
+            open=df['Open'],
+            high=df['High'],
+            low=df['Low'],
+            close=df['Close'],
             increasing_line_color="black",
             decreasing_line_color="black",
             opacity=0.5,
