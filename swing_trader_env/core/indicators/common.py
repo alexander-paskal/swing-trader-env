@@ -43,7 +43,7 @@ class sma(Indicator):
     def __init__(self, period: int):
         self.period = period
     
-    def _compute(self, df: pd.DataFrame) -> pd.Series:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Simple Moving Average
 
@@ -59,18 +59,6 @@ class sma(Indicator):
 
         return df['Close'].rolling(window=self.period).mean()
     
-    def _name(self) -> str:
-        return f"sma-{self.period}" 
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, **kwargs)
-        return ax
-    
 
 
 class ema(Indicator):
@@ -82,7 +70,7 @@ class ema(Indicator):
     def __init__(self, period: int):
         self.period = period
     
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Exponential Moving Average
 
@@ -96,17 +84,6 @@ class ema(Indicator):
         """
         return df['Close'].ewm(span=50, adjust=False).mean()
 
-    def _name(self) -> str:
-        return f"ema-{self.period}" 
-    
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 class macd(Indicator):
     fast: int
@@ -117,7 +94,7 @@ class macd(Indicator):
         self.fast = fast
         self.slow = slow
     
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Moving Average Convergence - Divergence Indicator
 
@@ -130,18 +107,6 @@ class macd(Indicator):
 
         return fast - slow
         
-    
-    def _name(self) -> str:
-        return f"macd-{self.fast}_{self.slow}" 
-    
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 class macd_hist(Indicator):
 
@@ -154,7 +119,7 @@ class macd_hist(Indicator):
         self.slow = slow
         self.signal = signal
 
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Moving Average Convergence - Divergence HistogramIndicator
 
@@ -168,25 +133,7 @@ class macd_hist(Indicator):
         macd = fast - slow
         signal = macd.ewm(span=9, adjust=False).mean()
         return macd - signal
-    
-    def _name(self) -> str:
-        return f"macd_hist-{self.fast}_{self.slow}_{self.signal}" 
-    
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, pos_c="green", neg_c="red", **kwargs) -> Any:
-        """
-        pos_c: str, color passed to ax.bar() for positive values
-        neg_c: str, color passed to ax.bar() for negative values
-        """
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        pos = series.where(series > 0, 0)
-        neg = series.where(series <= 0, 0)
 
-        ax.bar(series.index, pos, label=self._name() + "-positive", color=pos_c, **kwargs)
-        ax.bar(series.index, neg, label=self._name() + "-negative", color=neg_c, **kwargs)
-        return ax
 
 class bollinger_upper(Indicator):
 
@@ -197,7 +144,7 @@ class bollinger_upper(Indicator):
         self.period = period
         self.k = k
     
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Bollinger band upper bound
 
@@ -218,17 +165,6 @@ class bollinger_upper(Indicator):
         # Calculate the Upper and Lower Bands
         return middle + self.k * std
 
-    def _name(self) -> str:
-        return f'bollinger_upper-{self.period}_{self.k}'
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 class bollinger_lower(Indicator):
 
@@ -239,7 +175,7 @@ class bollinger_lower(Indicator):
         self.period = period
         self.k = k
     
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Bollinger band upper bound
 
@@ -260,17 +196,6 @@ class bollinger_lower(Indicator):
         # Calculate the Upper and Lower Bands
         return middle - self.k * std
 
-    def _name(self) -> str:
-        return f'bollinger_lower-{self.period}_{self.k}'
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 class rsi(Indicator):
 
@@ -278,7 +203,7 @@ class rsi(Indicator):
     def __init__(self, period: int):
         self.period = period
     
-    def _compute(self, df: pd.DataFrame) -> pd.DataFrame:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Relative Strength Index
 
@@ -304,24 +229,12 @@ class rsi(Indicator):
         # Calculate the RSI
         return 100 - (100 / (1 + rs))
     
-    def _name(self) -> str:
-        return f"rsi-{self.period}"
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
-    
 
 class stochastic_oscillator(Indicator):
     def __init__(self, period: int):
         self.period = period
     
-    def _compute(self, df: pd.DataFrame) -> pd.Series:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Computes the Stochastic Oscillator.
 
@@ -331,23 +244,12 @@ class stochastic_oscillator(Indicator):
         high_max = df['High'].rolling(window=self.period).max()
         return 100 * (df['Close'] - low_min) / (high_max - low_min)
     
-    def _name(self) -> str:
-        return f"stochastic_oscillator-{self.period}"
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 class atr(Indicator):
     def __init__(self, period: int):
         self.period = period
     
-    def _compute(self, df: pd.DataFrame) -> pd.Series:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Computes the Average True Range (ATR).
 
@@ -368,66 +270,31 @@ class atr(Indicator):
 
         return tr.rolling(window=self.period).mean()
     
-    def _name(self) -> str:
-        return f"atr-{self.period}"
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
 
 class obv(Indicator):
     def __init__(self):
         pass
     
-    def _compute(self, df: pd.DataFrame) -> pd.Series:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Computes the On-Balance Volume (OBV).
 
         OBV adds volume on up days and subtracts volume on down days. It helps to confirm price trends.
         """
         return (df['Volume'] * df['Close'].diff().apply(lambda x: 1 if x > 0 else -1)).cumsum()
-    
-    
-    def _name(self) -> str:
-        return "obv"
-
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.bar(series, label=self._name(), **kwargs)
-        return ax
 
 
 class vwap(Indicator):
     def __init__(self):
         pass
     
-    def _compute(self, df: pd.DataFrame) -> pd.Series:
+    def __call__(self, df: pd.DataFrame) -> pd.Series:
         """
         Computes the Volume Weighted Average Price (VWAP).
 
         VWAP is calculated as the cumulative sum of (Price x Volume) divided by the cumulative sum of Volume.
         """
         return (df['Close'] * df['Volume']).cumsum() / df['Volume'].cumsum()
-    
-    def _name(self) -> str:
-        return "vwap"
 
-    def _plot_matplotlib(self, series: pd.Series, ax: Any = None, **kwargs) -> Any:
-        
-        import matplotlib.pyplot as plt
-        if ax is None:
-            ax = plt.subplot()
-        
-        ax.plot(series, label=self._name(), **kwargs)
-        return ax
 
