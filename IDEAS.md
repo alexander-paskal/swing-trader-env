@@ -1,0 +1,4 @@
+- Gym style wrappers should be supported
+- Common reward signals should be supported
+    - Sharpe ratio
+- A mechanism for including indicators in the state as a wrapper
