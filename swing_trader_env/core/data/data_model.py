@@ -182,4 +182,7 @@ class DataModel:
         return self.get_price_on_close(end) / self.get_price_on_open(start)
 
     def end_date(self) -> Date:
+        """
+        Gets the end date
+        """
         return self.get_date_bounds()[1]
