@@ -8,6 +8,9 @@ from swing_trader_env.types import BuyAction, SellAction, BuyEvent, SellEvent
 from swing_trader_env.core.utils import Date
 from swing_trader_env.core.data import DataModel
 
+# external import
+import pandas as pd
+
 
 class SingleStockEnv(BaseEnv):
     """
@@ -112,9 +115,9 @@ class SingleStockEnv(BaseEnv):
         self._actions = []
     
 
-    def step(self, action: BuyAction|SellAction|None = None) -> None:
+    def step(self, action: BuyAction|SellAction|None = None) -> pd.DataFrame:
         """
-        Steps the environment one tick forward.
+        Steps the environment one tick forward. Returns a dataframe filtered by the most recent datapoint
 
         Stepping runs through one day of trading, from pre-trading hours to open to close.
         only off-hours trading is allowed for now (day-trading support will come one day). Executes the following steps:
@@ -126,6 +129,8 @@ class SingleStockEnv(BaseEnv):
 
 
         action: Optional, BuyAction or SellAction denoting the ticker to sell and the number of shares
+
+        :returns pd.DataFrame, YFinance style dataframe up through the current date
         """
         
         # record buy or sell action and annotate date
@@ -185,7 +190,11 @@ class SingleStockEnv(BaseEnv):
         self.performance = self.net_worth / self.principal
         self.cur_price = close_price
 
-        return 
+        # filter data frame by cur date
+        df_freq = getattr(self._data, self.frequency)
+        df_freq = df_freq[df_freq <= self.cur_date.as_timestamp]
+
+        return df_freq
 
 
     def render(self, mode: str = "plotly"):
